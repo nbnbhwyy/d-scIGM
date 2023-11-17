@@ -1,0 +1,51 @@
+import torch.nn as nn
+from torch.nn.parameter import Parameter
+import numpy as np
+import torch
+from torch.utils.data import Dataset, DataLoader
+import os
+import pickle
+from mydataset import *
+from model import *
+import pickle
+import random
+from trainer import GBN_trainer
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--batch_size', type=int, default=32, help="models used.")
+parser.add_argument('--no-cuda', action='store_true', default=False, help='Disables CUDA training.')
+parser.add_argument('--seed', type=int, default=0, help='Random seed.')
+parser.add_argument('--epochs', type=int, default=500, help='Number of epochs to train.')
+parser.add_argument('--rate', type=int, default = 0., help='Number of units in hidden layer 1.')
+parser.add_argument('--topic_size', type=list, default=[100, 100, 100, 100, 100, 100], help='Number of units in hidden layer 1.')
+parser.add_argument('--hidden_size', type=int, default=[9275,1387, 1066, 447,147,26], help='Number of units in hidden layer 1.')
+parser.add_argument('--vocab_size', type=int, default=2000, help='Number of vocabulary')
+parser.add_argument('--embed_size', type=int, default=200, help='Number of units in hidden layer 1.')
+parser.add_argument('--lr', type=float, default=1e-2,help='Initial learning rate.')
+parser.add_argument('--weight_decay', type=float, default=0.0, help='Initial learning rate.')
+parser.add_argument('--dataset_dir', type=str, default='../datasets/', help='type of dataset.')
+parser.add_argument('--output_dir', type=str, default='../results/', help='type of dataset.')
+parser.add_argument('--save_path', type=str, default='../save/', help='type of dataset.')
+# parser.add_argument('--device', type=str, default='cuda:1', help='train device')
+parser.add_argument('--dataname', type=str, default='yan_HIGHPRE.csv', help='Dataset: 20ng_6|20ng_20|reuters|rcv2|web|tmn|d  p')
+parser.add_argument('--labelname', type=str, default='yan_cell_anno.csv', help='Dataset: 20ng_6|20ng_20|reuters|rcv2|web|tmn|dp')
+from torch.backends import cudnn                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+args = parser.parse_args()  
+
+args.cuda = not args.no_cuda and torch.cuda.is_available()
+args.device = 'cuda:2' if args.cuda else 'cpu' 
+np.random.seed(args.seed)
+
+torch.manual_seed(args.seed)
+if args.cuda:
+    torch.cuda.manual_seed(args.seed)
+print(args.labelname)
+
+train_loader, voc = dataloader(data_path = args.dataset_dir ,labelname=args.labelname,dataname=args.dataname, mode='train', batch_size=args.batch_size)
+test_loader, _ = dataloader(data_path = args.dataset_dir, labelname=args.labelname,dataname=args.dataname, mode='test', batch_size=args.batch_size)
+
+args.vocab_size = len(voc)
+
+trainer = GBN_trainer(args,  voc_path=voc)
+trainer.train(train_loader,test_loader)
