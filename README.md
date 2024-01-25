@@ -19,13 +19,12 @@ The repository includes detailed installation instructions and requirements, scr
 + torch == 1.8.1
 + scanpy == 1.9.1
 
-Topic_gene_embedding
 
 ## 3 Usage
 
 ### Data format
 
-d-scIGM requires cell-by-cell-gene matrix and cell type information to be entered in csv object format.
+d-scIGM requires cell-by-cell-gene matrix and cell type information to be entered in .csv object format.
 
 ### Training
 
